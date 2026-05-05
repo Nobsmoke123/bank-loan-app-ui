@@ -1,7 +1,6 @@
 {
   "name": "loan-app",
   "version": "0.1.0",
-  "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build",
