@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: #f5f1eb;
+  color: #0a0a0f;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-slate text-cream px-6 py-3 font-medium tracking-wide transition-all duration-200 hover:bg-ink active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-gold {
+    @apply bg-gold text-ink px-6 py-3 font-medium tracking-wide transition-all duration-200 hover:bg-gold-light active:scale-95 disabled:opacity-50;
+  }
+
+  .btn-danger {
+    @apply bg-danger text-white px-4 py-2 text-sm font-medium tracking-wide transition-all duration-200 hover:bg-danger-light active:scale-95;
+  }
+
+  .btn-success {
+    @apply bg-emerald text-white px-4 py-2 text-sm font-medium tracking-wide transition-all duration-200 hover:bg-emerald-light active:scale-95;
+  }
+
+  .btn-outline {
+    @apply border border-slate text-slate px-6 py-3 font-medium tracking-wide transition-all duration-200 hover:bg-slate hover:text-cream active:scale-95;
+  }
+
+  .input-field {
+    @apply w-full border border-slate/20 bg-white px-4 py-3 text-ink placeholder-ink/40 focus:outline-none focus:border-slate transition-colors;
+  }
+
+  .card {
+    @apply bg-white border border-slate/10 p-6 shadow-sm;
+  }
+
+  .page-container {
+    @apply min-h-screen bg-cream;
+  }
+
+  .label {
+    @apply block text-xs font-medium tracking-widest uppercase text-ink/60 mb-2;
+  }
+}
+
+/* Subtle grain texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+}
+
+/* Page transitions */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease forwards;
+}
+
+/* Stagger children */
+.stagger > * {
+  opacity: 0;
+  animation: fadeIn 0.4s ease forwards;
+}
+.stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger > *:nth-child(6) { animation-delay: 0.3s; }
