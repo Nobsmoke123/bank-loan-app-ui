@@ -1,19 +1,17 @@
 # Loan App UI
 
-A modern loan management frontend built with Next.js 14, TypeScript, and Tailwind CSS.
+A modern loan management frontend built with Next.js, TypeScript, and Tailwind CSS.
 
-This project provides an end-to-end client-side workflow for:
+This project provides an end-to-end workflow backed by a loan service API for:
 
 - user registration and login
 - loan application submission
 - loan processing (approve/reject)
 - repayment tracking and payment recording
 
-The app currently uses a browser `localStorage` store for persistence and session state.
-
 ## Tech Stack
 
-- `Next.js 14` (App Router)
+- `Next.js 16` (App Router)
 - `React 18`
 - `TypeScript`
 - `Tailwind CSS`
@@ -88,11 +86,9 @@ cp .env.sample .env
 Set:
 
 ```env
-NEXT_LOAN_SERVICE_API_URL=<your-backend-base-url>
+LOAN_SERVICE_API_URL=http://localhost:3000
+SESSION_SECRET=<your-session-secret>
 ```
-
-> Note: Current UI pages rely on the local `lib/store.ts` implementation.  
-> The API layer (`lib/api.ts`, `lib/client.ts`) is available for backend integration.
 
 ### Run in Development
 
@@ -126,36 +122,8 @@ pnpm lint
 - `/loan-application` - submit a new loan request
 - `/loan-processing` - review all loans and action pending items
 - `/loan-repayment` - make repayments on active loans
-
-## Data Model (Client-Side Store)
-
-Defined in `lib/store.ts`.
-
-### `User`
-
-- `id: string`
-- `name: string`
-- `email: string`
-- `password: string`
-
-### `Loan`
-
-- `id: string`
-- `userId: string`
-- `userName: string`
-- `userEmail: string`
-- `amount: number`
-- `durationInMonths: number`
-- `status: "pending" | "active" | "completed" | "rejected"`
-- `appliedAt: string`
-- `monthlyPayment: number`
-- `paidAmount: number`
-
-### Storage Keys
-
-- `loan_app_users`
-- `loan_app_loans`
-- `loan_app_session`
+- `/loans` - list all loans available to the current user
+- `/loans/:id` - view a single loan and its repayments
 
 ## Business Logic Notes
 
@@ -168,19 +136,14 @@ Defined in `lib/store.ts`.
   - `active` (approved)
   - `rejected`
 
-## API Layer (Prepared for Backend Integration)
+## API Layer
 
-The following utilities exist but are not yet wired into route pages:
+The app now uses backend-backed authentication and loan APIs:
 
-- `lib/api.ts`: generic `apiFetch<T>()`
-  - prepends `NEXT_LOAN_SERVICE_API_URL`
-  - sends JSON headers
-  - includes credentials for cookie-based auth
-- `lib/client.ts`: helper functions for endpoints such as:
-  - auth (`/auth/login`, `/auth/register`, `/auth/logout`, `/auth/me`)
-  - loans (`/loans`, `/loans/:id`, `/loans/:id/repay`)
-
-This makes it straightforward to migrate from local storage to a live backend.
+- `lib/api.ts`: server-side backend fetch helpers
+- `app/actions/auth.ts`: login, register, logout server actions
+- `app/actions/loans.ts`: apply, repay, and process loan server actions
+- `lib/dal.ts`: authenticated user lookup and protected data access
 
 ## Styling
 
@@ -199,15 +162,12 @@ From `package.json`:
 - `pnpm dev` - run Next.js dev server on port `3001`
 - `pnpm build` - create production build
 - `pnpm start` - start production server
-- `pnpm lint` - run Next.js lint checks
+- `pnpm lint` - generate Next route types and run TypeScript checks
 
 ## Known Limitations
 
-- Data persistence is browser-local only (`localStorage`):
-  - different browsers/devices do not share state
-  - clearing browser storage resets data
-- Authentication is client-side and intended for demo/prototype flows.
-- Role-based access control is not enforced (all logged-in users can access processing view).
+- The UI expects the backend auth service to be available at `LOAN_SERVICE_API_URL`.
+- Name data in session-aware UI is derived from login/register responses or falls back to the email local-part when only `/auth/me` is available.
 
 ## Next Steps (Suggested)
 

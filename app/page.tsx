@@ -1,17 +1,8 @@
-"use client";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { getCurrentUser } from "@/lib/store";
+import { redirect } from "next/navigation";
+import { getAuthUser } from "@/lib/dal";
 
-export default function Home() {
-  const router = useRouter();
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (user) {
-      router.replace("/dashboard");
-    } else {
-      router.replace("/login");
-    }
-  }, [router]);
-  return null;
+export default async function Home() {
+  const user = await getAuthUser();
+
+  redirect(user ? "/dashboard" : "/login");
 }

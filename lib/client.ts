@@ -1,70 +1,60 @@
-import { apiFetch } from "./api";
+import type { ApiResult } from "./definitions";
 
-export const login = async (email: string, password: string) => {
-  return apiFetch("/auth/login", {
-    body: JSON.stringify({ email, password }),
-    method: "POST",
-  });
-};
+export type {
+  AuthResponse,
+  AuthenticatedUser,
+  DashboardStats,
+  Loan,
+  LoanStatus,
+  MutationResult,
+  ProfileResponse,
+  UserRole,
+} from "./definitions";
 
-export const register = async (
-  name: string,
-  email: string,
-  password: string,
-) => {
-  return apiFetch("/auth/register", {
-    body: JSON.stringify({ name, email, password }),
-    method: "POST",
-  });
-};
+export async function clientFetch<T>(
+  path: string,
+  options: RequestInit = {},
+): Promise<ApiResult<T>> {
+  try {
+    const response = await fetch(path, {
+      ...options,
+      credentials: "include",
+      headers: {
+        ...(options.body ? { "Content-Type": "application/json" } : {}),
+        ...options.headers,
+      },
+    });
 
-export const logout = async () => {
-  return apiFetch("/auth/logout", {
-    method: "POST",
-  });
-};
+    const contentType = response.headers.get("content-type");
+    const body = contentType?.includes("application/json")
+      ? await response.json()
+      : null;
 
-export const profile = async () => {
-  return apiFetch("/auth/me", {
-    method: "GET",
-  });
-};
+    if (!response.ok) {
+      return {
+        success: false,
+        error: {
+          message: body?.message ?? "Something went wrong.",
+          error: body?.error ?? "UnknownError",
+          statusCode: body?.statusCode ?? response.status,
+        },
+      };
+    }
 
-export const getLoans = async () => {
-  return apiFetch("/loans", {
-    method: "GET",
-  });
-};
+    return {
+      success: true,
+      data: body as T,
+    };
+  } catch (error) {
+    console.error("Client request failed", error);
 
-export const getLoan = async (loan_id: string) => {
-  return apiFetch(`/loans/${loan_id}`, {
-    method: "GET",
-  });
-};
-
-export const applyForLoan = async (
-  amount: number,
-  durationInMonths: number,
-) => {
-  return apiFetch("/loans", {
-    method: "POST",
-    body: JSON.stringify({ amount, durationInMonths }),
-  });
-};
-
-export const processLoan = async (
-  loan_id: string,
-  status: "approved" | "rejected",
-) => {
-  return apiFetch(`loans/${loan_id}`, {
-    method: "PATCH",
-    body: JSON.stringify({ status }),
-  });
-};
-
-export const repayLoan = async (loan_id: string, amount: number) => {
-  return apiFetch(`loans/${loan_id}/repay`, {
-    method: "POST",
-    body: JSON.stringify({ amount }),
-  });
-};
+    return {
+      success: false,
+      error: {
+        message: "Unable to reach the application.",
+        error: "NetworkError",
+        statusCode: 500,
+      },
+    };
+  }
+}

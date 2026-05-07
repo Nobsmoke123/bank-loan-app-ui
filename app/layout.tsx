@@ -1,19 +1,25 @@
 import type { Metadata } from "next";
+import { getAuthUser } from "@/lib/dal";
+import AuthProvider from "@/providers/auth.provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LoanVault — Lending Management",
+  title: "Loan App - Lending Management",
   description: "Modern loan management platform",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const authUser = await getAuthUser();
+
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AuthProvider initialUser={authUser}>{children}</AuthProvider>
+      </body>
     </html>
   );
 }
